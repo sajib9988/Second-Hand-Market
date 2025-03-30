@@ -38,34 +38,40 @@ export default function LoginForm() {
     formState: { isSubmitting },
   } = form;
 
-  const handleReCaptcha = async (value: string | null) => {
-    try {
-      const res = await reCaptchaTokenVerification(value!);
-      if (res?.success) {
-        setReCaptchaStatus(true);
-      }
-    } catch (err: any) {
-      console.error(err);
-    }
-  };
+  // const handleReCaptcha = async (value: string | null) => {
+  //   try {
+  //     const res = await reCaptchaTokenVerification(value!);
+  //     if (res?.success) {
+  //       setReCaptchaStatus(true);
+  //     }
+  //   } catch (err: any) {
+  //     console.error(err);
+  //   }
+  // };
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    console.log("Form data:", data); // Log the form data
     try {
+      console.log("Submitting form with data:", data); // Check if this is logged in console
       const res = await loginUser(data);
+      console.log("Login response:", res); // Log the response
       if (res?.success) {
-        toast.success(res?.message);
+        toast.success(res?.message || "Login successful");
         if (redirect) {
           router.push(redirect);
         } else {
           router.push("/profile");
         }
       } else {
-        toast.error(res?.message);
+        console.error("Login failed:", res);
+        toast.error(res?.message || "Login failed for unknown reason");
       }
     } catch (err: any) {
-      console.error(err);
+      console.error("Login exception:", err); // Catch any errors here
+      toast.error("An error occurred during login. Please try again.");
     }
   };
+  
 
 
   return (
@@ -73,8 +79,7 @@ export default function LoginForm() {
       <div className="flex items-center space-x-4 ">
         <Logo />
         <div>
-          <h1 className="text-xl font-semibold">Login</h1>
-          <p className="font-extralight text-sm text-gray-600">Welcome back!</p>
+          <h1 className="text-xl font-semibold">Login Please</h1>
         </div>
       </div>
       <Form {...form}>
@@ -106,16 +111,16 @@ export default function LoginForm() {
             )}
           />
 
-          <div className="flex mt-3 w-full">
+          {/* <div className="flex mt-3 w-full">
             <ReCAPTCHA
               sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_CLIENT_KEY as string}
               onChange={handleReCaptcha}
               className="mx-auto"
             />
-          </div>
+          </div> */}
 
           <Button
-            disabled={reCaptchaStatus ? false : true}
+            // disabled={reCaptchaStatus ? false : true}
             type="submit"
             className="mt-5 w-full"
           >
