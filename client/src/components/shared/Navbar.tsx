@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useUser } from "@/context/userContext";
-import { ShoppingCart, LogOut, LogIn, SwitchCamera, Heart } from "lucide-react";
+import { ShoppingCart, LogOut, LogIn, SwitchCamera, Heart, Home, ShoppingBag } from "lucide-react";  
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,23 +14,31 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Logo from "@/assets/svgs/Logo";
+import { logout } from "@/service/AuthService";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
-  const { user } = useUser();
+  const { user, setUser } = useUser();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isSellerMode, setIsSellerMode] = useState(false);
   const [dashboardLink, setDashboardLink] = useState("");
-
+  const router = useRouter();
+  
   useEffect(() => {
     if (!user) return;
 
     if (user.role === "admin") {
       setDashboardLink("/admin/dashboard");
     } else {
-      // User can switch between seller and buyer mode
       setDashboardLink(isSellerMode ? "/user/seller/dashboard" : "/user/buyer/dashboard");
     }
   }, [user, isSellerMode]);
+
+  const handleLogout = async () => {
+    await logout();
+    setUser(null);
+    router.push('/login'); // Redirect after logout
+  };
 
   return (
     <nav className="bg-white shadow-sm">
@@ -38,14 +46,21 @@ export default function Navbar() {
         <div className="flex justify-between items-center py-4 px-4">
           {/* Left Side: Logo & Links */}
           <div className="flex items-center">
-            <Link href="/" className="text-2xl font-black flex items-center">
-              {typeof Logo === 'function' ? <Logo /> : null}
-              <span className="ml-2">SecondHandMarket</span>
-            </Link>
+            <span  className="text-2xl font-black flex items-center">
+              <Logo /> {/* Logo without the text "Your Shop" */}
+            </span>
 
             <div className="hidden md:flex space-x-6 ml-6">
-              <Link href="/" className="hover:text-blue-600">Home</Link>
-              <Link href="/products" className="hover:text-blue-600">Products</Link>
+              {/* Home Icon with Name */}
+              <Link href="/" className="text-center">
+                <Home className="w-7 h-7 mx-auto" /> {/* Increased Home Icon Size */}
+                <span className="text-sm">Home</span>
+              </Link>
+              {/* Products Icon with Name */}
+              <Link href="/products" className="text-center">
+                <ShoppingBag className="w-7 h-7 mx-auto" /> {/* Products Icon */}
+                <span className="text-sm">Products</span>
+              </Link>
             </div>
           </div>
 
@@ -75,7 +90,6 @@ export default function Navbar() {
             {/* User Menu */}
             {user ? (
               <div className="flex items-center space-x-2">
-                {/* Seller / Buyer Mode Toggle Button */}
                 {user.role !== "admin" && (
                   <Button
                     onClick={() => setIsSellerMode(!isSellerMode)}
@@ -107,11 +121,8 @@ export default function Navbar() {
                     <DropdownMenuItem>
                       <Link href={dashboardLink} className="w-full">Dashboard</Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Link href="/create-shop" className="w-full">Create Shop</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="bg-red-500 text-white hover:bg-red-600" onClick={logout}>
+                     <DropdownMenuSeparator />
+                    <DropdownMenuItem className="bg-red-500 text-white hover:bg-red-600" onClick={handleLogout}>
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Logout</span>
                     </DropdownMenuItem>
@@ -137,18 +148,17 @@ export default function Navbar() {
         {/* Mobile Menu */}
         {menuOpen && (
           <div className="md:hidden bg-gray-100 p-4 flex flex-col space-y-2">
-            <Link href="/" className="hover:text-blue-600">Home</Link>
-            <Link href="/products" className="hover:text-blue-600">Products</Link>
-            
-            {/* Mobile Search */}
+           
+            <Link href="/products" className="text-center hover:text-blue-600">
+              <ShoppingBag className="w-7 h-7 mx-auto" /> {/* Products Icon for mobile */}
+              <span className="text-sm">Products</span>
+            </Link>
             <input
               type="text"
               placeholder="Search for products"
               className="w-full border border-gray-300 rounded-full py-2 px-5 my-2"
             />
-
             {user && <Link href={dashboardLink} className="hover:text-blue-600">Dashboard</Link>}
-
             {user && user.role !== "admin" && (
               <button 
                 onClick={() => setIsSellerMode(!isSellerMode)}
@@ -157,9 +167,8 @@ export default function Navbar() {
                 {isSellerMode ? "Switch to Buyer" : "Switch to Seller"}
               </button>
             )}
-
             {user ? (
-              <button  className="bg-red-500 text-white px-4 py-2 rounded text-left">Logout</button>
+              <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded text-left">Logout</button>
             ) : (
               <Link href="/login" className="bg-blue-600 text-white px-4 py-2 rounded block text-center">Login</Link>
             )}
@@ -168,4 +177,4 @@ export default function Navbar() {
       </div>
     </nav>
   );
-} 
+}
