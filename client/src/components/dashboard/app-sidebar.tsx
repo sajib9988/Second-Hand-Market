@@ -27,18 +27,18 @@ const adminData = {
 const userData = {
   seller: {
     navMain: [
-      { title: "Dashboard", url: "/seller/dashboard", icon: SquareTerminal },
-      { title: "Manage Listings", url: "/seller/manage-listings", icon: Building },
-      { title: "Sales History", url: "/seller/sales-history", icon: FileText },
-      { title: "Profile", url: "/seller/profile", icon: UserCog },
+      { title: "Dashboard", url: "/user/seller/dashboard", icon: SquareTerminal },
+      { title: "Manage Listings", url: "/user/seller/manage-listings", icon: Building },
+      { title: "Sales History", url: "/user/seller/sales-history", icon: FileText },
+      { title: "Profile", url: "/user/seller/profile", icon: UserCog },
     ],
   },
   buyer: {
     navMain: [
-      { title: "Dashboard", url: "/buyer/dashboard", icon: SquareTerminal },
-      { title: "Wishlist", url: "/buyer/wishlist", icon: BadgeCheck },
-      { title: "Purchase History", url: "/buyer/purchase-history", icon: FileText },
-      { title: "Profile", url: "/buyer/profile", icon: UserCog },
+      { title: "Dashboard", url: "/user/buyer/dashboard", icon: SquareTerminal },
+      { title: "Wishlist", url: "/user/buyer/wishlist", icon: BadgeCheck },
+      { title: "Purchase History", url: "/user/buyer/purchase-history", icon: FileText },
+      { title: "Profile", url: "/user/buyer/profile", icon: UserCog },
     ],
   },
 };
