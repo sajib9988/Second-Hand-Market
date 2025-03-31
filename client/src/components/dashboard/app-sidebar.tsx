@@ -76,12 +76,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           {/* 🔹 Role Toggler - Compact Design */}
           {user?.role !== "admin" && (
             <SidebarMenuItem className="mt-0">
-              <div className="flex gap-1 w-full">
+              <div className="flex gap-1 w-full mt-2">
                 <SidebarMenuButton
                   size="sm"
                   className={`cursor-pointer text-xs py-1 ${
                     selectedRole === "buyer" 
-                      ? "bg-sidebar-accent text-white font-medium" 
+                      ? "bg-sidebar-accent text-black font-medium border-2 border-black" 
                       : "text-slate-700"
                   }`}
                   onClick={() => setSelectedRole("buyer")}
@@ -92,7 +92,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   size="sm"
                   className={`cursor-pointer text-xs py-1 ${
                     selectedRole === "seller" 
-                      ? "bg-sidebar-accent text-white font-medium" 
+                      ? "bg-sidebar-accent text-black font-medium border-2 border-black" 
                       : "text-slate-700"
                   }`}
                   onClick={() => setSelectedRole("seller")}

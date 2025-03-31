@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useUser } from "@/context/userContext";
-import { ShoppingCart, LogOut, LogIn, SwitchCamera, Heart, Home, ShoppingBag } from "lucide-react";  
+import { ShoppingCart, LogOut, LogIn, Heart, Home, ShoppingBag } from "lucide-react";  
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,7 +20,6 @@ import { useRouter } from "next/navigation";
 export default function Navbar() {
   const { user, setUser } = useUser();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isSellerMode, setIsSellerMode] = useState(false);
   const [dashboardLink, setDashboardLink] = useState("");
   const router = useRouter();
   
@@ -30,9 +29,9 @@ export default function Navbar() {
     if (user.role === "admin") {
       setDashboardLink("/admin/dashboard");
     } else {
-      setDashboardLink(isSellerMode ? "/user/seller/dashboard" : "/user/buyer/dashboard");
+      setDashboardLink("/user/dashboard");
     }
-  }, [user, isSellerMode]);
+  }, [user]);
 
   const handleLogout = async () => {
     await logout();
@@ -90,18 +89,6 @@ export default function Navbar() {
             {/* User Menu */}
             {user ? (
               <div className="flex items-center space-x-2">
-                {user.role !== "admin" && (
-                  <Button
-                    onClick={() => setIsSellerMode(!isSellerMode)}
-                    variant="outline"
-                    size="sm"
-                    className="rounded-full flex items-center space-x-1"
-                  >
-                    <SwitchCamera className="w-4 h-4 mr-1" />
-                    <span className="hidden md:inline">{isSellerMode ? "Seller Mode" : "Buyer Mode"}</span>
-                  </Button>
-                )}
-
                 {/* User Dropdown */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -148,7 +135,6 @@ export default function Navbar() {
         {/* Mobile Menu */}
         {menuOpen && (
           <div className="md:hidden bg-gray-100 p-4 flex flex-col space-y-2">
-           
             <Link href="/products" className="text-center hover:text-blue-600">
               <ShoppingBag className="w-7 h-7 mx-auto" /> {/* Products Icon for mobile */}
               <span className="text-sm">Products</span>
@@ -159,14 +145,6 @@ export default function Navbar() {
               className="w-full border border-gray-300 rounded-full py-2 px-5 my-2"
             />
             {user && <Link href={dashboardLink} className="hover:text-blue-600">Dashboard</Link>}
-            {user && user.role !== "admin" && (
-              <button 
-                onClick={() => setIsSellerMode(!isSellerMode)}
-                className="text-left hover:text-blue-600"
-              >
-                {isSellerMode ? "Switch to Buyer" : "Switch to Seller"}
-              </button>
-            )}
             {user ? (
               <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded text-left">Logout</button>
             ) : (
