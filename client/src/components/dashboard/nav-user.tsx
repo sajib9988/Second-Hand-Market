@@ -1,121 +1,94 @@
 "use client";
 
-import * as React from "react";
+import { ChevronsUpDown, LogOut } from "lucide-react";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
-import { SquareTerminal, Users, Building, FileText, BadgeCheck, UserCog } from "lucide-react";
-import Link from "next/link";
-import Logo from "@/assets/svgs/Logo";
+import { usePathname, useRouter } from "next/navigation";
 import { useUser } from "@/context/userContext";
+import { logout } from "@/service/AuthService";
+import { protectedRoutes } from "@/constant";
 
-const adminData = {
-  navMain: [
-    { title: "Dashboard", url: "/admin/dashboard", icon: SquareTerminal },
-    { title: "User Management", url: "/admin/user-management", icon: Users },
-    { title: "Profile", url: "/admin/profile", icon: UserCog },
-  ],
-};
 
-const userData = {
-  seller: {
-    navMain: [
-      { title: "Dashboard", url: "/seller/dashboard", icon: SquareTerminal },
-      { title: "Manage Listings", url: "/seller/manage-listings", icon: Building },
-      { title: "Sales History", url: "/seller/sales-history", icon: FileText },
-      { title: "Profile", url: "/seller/profile", icon: UserCog },
-    ],
-  },
-  buyer: {
-    navMain: [
-      { title: "Dashboard", url: "/buyer/dashboard", icon: SquareTerminal },
-      { title: "Wishlist", url: "/buyer/wishlist", icon: BadgeCheck },
-      { title: "Purchase History", url: "/buyer/purchase-history", icon: FileText },
-      { title: "Profile", url: "/buyer/profile", icon: UserCog },
-    ],
-  },
-};
+export function NavUser() {
+  const { isMobile } = useSidebar();
+  const { user, setIsLoading } = useUser();
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { user } = useUser();
-  const userRole = user?.role;
+  const router = useRouter();
+  const pathname = usePathname();
 
-  // ✅ State for tracking current mode (seller or buyer)
-  const [currentMode, setCurrentMode] = React.useState<"seller" | "buyer">("buyer");
+  const handleLogout = () => {
+    logout();
+    setIsLoading(true);
 
-  // ✅ Set navData based on role
-  let navData;
-  if (userRole === "admin") {
-    navData = adminData; // Admin শুধুমাত্র নিজের মেনু দেখতে পাবে
-  } else {
-    navData = currentMode === "seller" ? userData.seller : userData.buyer;
-  }
+    if (protectedRoutes.some((route) => pathname.match(route))) {
+      router.push("/");
+    }
+  };
 
   return (
-    <Sidebar collapsible="icon" {...props}>
-      {/* Sidebar Header with Logo */}
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <Link href="/">
-                <div className="flex items-center justify-center">
-                  <Logo />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <h2 className="font-bold text-xl">SecondHandMarketplace</h2>
-                </div>
-              </Link>
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton
+              size="sm"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground py-1"
+            >
+              <Avatar className="h-6 w-6 rounded-sm">
+                <AvatarImage alt={user?.name} />
+                <AvatarFallback className="rounded-sm text-xs">
+                  {user?.role?.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="grid flex-1 text-left text-xs leading-tight">
+                <span className="truncate font-medium">{user?.name}</span>
+                <span className="truncate text-[10px] text-muted-foreground">{user?.email}</span>
+              </div>
+              <ChevronsUpDown className="ml-auto size-3" />
             </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
-
-      {/* 🔹 Mode Switcher (Seller/Buyer) */}
-      {userRole !== "admin" && (
-        <div className="p-4">
-          <button
-            className={`w-full px-4 py-2 rounded-md ${currentMode === "seller" ? "bg-blue-600 text-white" : "bg-gray-200 text-black"}`}
-            onClick={() => setCurrentMode("seller")}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            className="w-[--radix-dropdown-menu-trigger-width] min-w-48 rounded-sm"
+            side={isMobile ? "bottom" : "right"}
+            align="end"
+            sideOffset={4}
           >
-            Seller Mode
-          </button>
-          <button
-            className={`w-full px-4 py-2 mt-2 rounded-md ${currentMode === "buyer" ? "bg-blue-600 text-white" : "bg-gray-200 text-black"}`}
-            onClick={() => setCurrentMode("buyer")}
-          >
-            Buyer Mode
-          </button>
-        </div>
-      )}
+            <DropdownMenuLabel className="p-0 font-normal">
+              <div className="flex items-center gap-2 px-1 py-1 text-left text-xs">
+                <Avatar className="h-6 w-6 rounded-sm">
+                  <AvatarImage alt={user?.name} />
+                  <AvatarFallback className="rounded-sm text-xs">
+                    {user?.role?.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="grid flex-1 text-left leading-tight">
+                  <span className="truncate font-medium">{user?.name}</span>
+                  <span className="truncate text-[10px] text-muted-foreground">{user?.email}</span>
+                </div>
+              </div>
+            </DropdownMenuLabel>
 
-      {/* Main Navigation */}
-      <SidebarContent>
-        <SidebarMenu>
-          {navData.navMain.map((item, index) => (
-            <SidebarMenuItem key={index}>
-              <SidebarMenuButton asChild>
-                <Link href={item.url} className="flex items-center space-x-2">
-                  <item.icon className="w-5 h-5" />
-                  <span>{item.title}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarContent>
-
-      {/* Sidebar Footer */}
-      <SidebarFooter>
-        <p className="text-center text-sm text-gray-500">© 2025 SecondHandMarketplace</p>
-      </SidebarFooter>
-    </Sidebar>
+            <DropdownMenuItem onClick={() => handleLogout()} className="text-xs">
+              <LogOut className="mr-1 h-3 w-3" />
+              Log out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    </SidebarMenu>
   );
 }

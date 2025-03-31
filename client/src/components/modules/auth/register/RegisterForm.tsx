@@ -17,8 +17,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { registrationSchema } from "./registerValidation";
 import { toast } from "sonner";
 import { registerUser } from "@/service/AuthService";
+import { Router } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
+
+  const router = useRouter()
   const form = useForm({
     resolver: zodResolver(registrationSchema),
   });
@@ -32,11 +36,13 @@ export default function RegisterForm() {
   //   console.log(password, passwordConfirm);
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+
     try {
       const res = await registerUser(data);
-      console.log(res);
+   
       if (res?.success) {
         toast.success(res?.message);
+        router.push("/"); // Redirect to home page after successful registration
       } else {
         toast.error(res?.message);
       }

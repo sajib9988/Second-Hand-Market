@@ -11,10 +11,19 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-import { SquareTerminal, Users, Building, FileText, BadgeCheck, UserCog } from "lucide-react";
+import {
+  SquareTerminal,
+  Users,
+  Building,
+  FileText,
+  BadgeCheck,
+  UserCog,
+} from "lucide-react";
 import Link from "next/link";
 import Logo from "@/assets/svgs/Logo";
 import { useUser } from "@/context/userContext";
+import { NavMain } from "./nav-main";
+import { NavUser } from "./nav-user";
 
 const adminData = {
   navMain: [
@@ -44,77 +53,62 @@ const userData = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const [selectedRole, setSelectedRole] = React.useState<"buyer" | "seller">("buyer");
   const { user } = useUser();
-  const userRole = user?.role;
-
-  // ✅ State for tracking current mode (seller or buyer)
-  const [currentMode, setCurrentMode] = React.useState<"seller" | "buyer">("buyer");
-
-  // ✅ Set navData based on role
-  let navData;
-  if (userRole === "admin") {
-    navData = adminData; // Admin শুধুমাত্র নিজের মেনু দেখতে পাবে
-  } else {
-    navData = currentMode === "seller" ? userData.seller : userData.buyer;
-  }
-
+  
+  let navData = user?.role === "admin" ? adminData : userData[selectedRole];
+  
   return (
-    <Sidebar collapsible="icon" {...props}>
-      {/* Sidebar Header with Logo */}
-      <SidebarHeader>
+    <Sidebar >
+      <SidebarHeader className="py-1">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
+            <SidebarMenuButton size="sm" asChild>
               <Link href="/">
                 <div className="flex items-center justify-center">
                   <Logo />
                 </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <h2 className="font-bold text-xl">SecondHandMarketplace</h2>
-                </div>
+             
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+
+          {/* 🔹 Role Toggler - Compact Design */}
+          {user?.role !== "admin" && (
+            <SidebarMenuItem className="mt-0">
+              <div className="flex gap-1 w-full">
+                <SidebarMenuButton
+                  size="sm"
+                  className={`cursor-pointer text-xs py-1 ${
+                    selectedRole === "buyer" 
+                      ? "bg-sidebar-accent text-white font-medium" 
+                      : "text-slate-700"
+                  }`}
+                  onClick={() => setSelectedRole("buyer")}
+                >
+                  Buyer
+                </SidebarMenuButton>
+                <SidebarMenuButton
+                  size="sm"
+                  className={`cursor-pointer text-xs py-1 ${
+                    selectedRole === "seller" 
+                      ? "bg-sidebar-accent text-white font-medium" 
+                      : "text-slate-700"
+                  }`}
+                  onClick={() => setSelectedRole("seller")}
+                >
+                  Seller
+                </SidebarMenuButton>
+              </div>
+            </SidebarMenuItem>
+          )}
         </SidebarMenu>
       </SidebarHeader>
-
-      {/* 🔹 Mode Switcher (Seller/Buyer) */}
-      {userRole !== "admin" && (
-        <div className="p-4">
-          <button
-            className={`w-full px-4 py-2 rounded-md ${currentMode === "seller" ? "bg-blue-600 text-white" : "bg-gray-200 text-black"}`}
-            onClick={() => setCurrentMode("seller")}
-          >
-            Seller Mode
-          </button>
-          <button
-            className={`w-full px-4 py-2 mt-2 rounded-md ${currentMode === "buyer" ? "bg-blue-600 text-white" : "bg-gray-200 text-black"}`}
-            onClick={() => setCurrentMode("buyer")}
-          >
-            Buyer Mode
-          </button>
-        </div>
-      )}
-
-      {/* Main Navigation */}
-      <SidebarContent>
-        <SidebarMenu>
-          {navData.navMain.map((item, index) => (
-            <SidebarMenuItem key={index}>
-              <SidebarMenuButton asChild>
-                <Link href={item.url} className="flex items-center space-x-2">
-                  <item.icon className="w-5 h-5" />
-                  <span>{item.title}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
+      <SidebarContent className="py-0">
+        {navData && <NavMain items={navData.navMain} />}
       </SidebarContent>
-
-      {/* Sidebar Footer */}
       <SidebarFooter>
-        <p className="text-center text-sm text-gray-500">© 2025 SecondHandMarketplace</p>
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   );

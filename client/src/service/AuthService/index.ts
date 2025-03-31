@@ -7,7 +7,7 @@ import { IUser } from "@/type";
 
 export const registerUser = async (userData: FieldValues) => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/auth/user`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/user`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
