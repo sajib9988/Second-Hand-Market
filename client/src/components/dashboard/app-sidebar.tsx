@@ -7,7 +7,6 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
@@ -24,6 +23,7 @@ import Logo from "@/assets/svgs/Logo";
 import { useUser } from "@/context/userContext";
 import { NavMain } from "./nav-main";
 import { NavUser } from "./nav-user";
+import { useRouter } from "next/navigation";
 
 const adminData = {
   navMain: [
@@ -39,7 +39,6 @@ const userData = {
       { title: "Dashboard", url: "/user/seller/dashboard", icon: SquareTerminal },
       { title: "Manage Listings", url: "/user/seller/manage-listings", icon: Building },
       { title: "Sales History", url: "/user/seller/sales-history", icon: FileText },
-      { title: "Profile", url: "/user/seller/profile", icon: UserCog },
     ],
   },
   buyer: {
@@ -55,58 +54,66 @@ const userData = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [selectedRole, setSelectedRole] = React.useState<"buyer" | "seller">("buyer");
   const { user } = useUser();
-  
+  const router = useRouter();
+
+  React.useEffect(() => {
+    if (user?.role !== "admin") {
+      const newPath = selectedRole === "buyer" ? "/user/buyer/dashboard" : "/user/seller/dashboard";
+      router.push(newPath);
+    }
+  }, [selectedRole, user?.role, router]);
+
   let navData = user?.role === "admin" ? adminData : userData[selectedRole];
-  
+
   return (
-    <Sidebar >
+    <Sidebar>
       <SidebarHeader className="py-1">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="sm" asChild>
-              <Link href="/">
-                <div className="flex items-center justify-center">
-                  <Logo />
-                </div>
-             
-              </Link>
-            </SidebarMenuButton>
+            <Link href="/">
+              <div className="flex items-center justify-center">
+                <Logo />
+              </div>
+            </Link>
           </SidebarMenuItem>
 
-          {/* 🔹 Role Toggler - Compact Design */}
+          {/* 🔹 Role Toggler - Switch Button */}
           {user?.role !== "admin" && (
-            <SidebarMenuItem className="mt-0">
-              <div className="flex gap-1 w-full mt-2">
-                <SidebarMenuButton
-                  size="sm"
-                  className={`cursor-pointer text-xs py-1 ${
-                    selectedRole === "buyer" 
-                      ? "bg-sidebar-accent text-black font-medium border-2 border-black" 
-                      : "text-slate-700"
-                  }`}
-                  onClick={() => setSelectedRole("buyer")}
-                >
-                  Buyer
-                </SidebarMenuButton>
-                <SidebarMenuButton
-                  size="sm"
-                  className={`cursor-pointer text-xs py-1 ${
-                    selectedRole === "seller" 
-                      ? "bg-sidebar-accent text-black font-medium border-2 border-black" 
-                      : "text-slate-700"
-                  }`}
-                  onClick={() => setSelectedRole("seller")}
-                >
-                  Seller
-                </SidebarMenuButton>
-              </div>
-            </SidebarMenuItem>
-          )}
+  <SidebarMenuItem className="mt-3 flex items-center justify-center">
+    <div
+      className={`relative w-32 h-10 flex items-center bg-green-500 rounded-full cursor-pointer transition-all duration-300 shadow-sm`}
+      onClick={() => setSelectedRole(selectedRole === "buyer" ? "seller" : "buyer")}
+    >
+      {/* Buyer Text */}
+      <span className={`absolute left-4 text-sm font-bold z-10 transition-all duration-300 ${
+        selectedRole === "buyer" ? "text-green-800" : "text-white opacity-80"
+      }`}>
+        Buyer
+      </span>
+      
+      {/* Seller Text */}
+      <span className={`absolute right-4 text-sm font-bold z-10 transition-all duration-300 ${
+        selectedRole === "seller" ? "text-green-800" : "text-white opacity-80"
+      }`}>
+        Seller
+      </span>
+      
+      {/* Sliding Indicator */}
+      <div
+        className={`absolute top-1 bottom-1 w-16 bg-white rounded-full transition-all duration-300 transform shadow-md ${
+          selectedRole === "seller" ? "right-1" : "left-1"
+        }`}
+      ></div>
+    </div>
+  </SidebarMenuItem>
+)}
         </SidebarMenu>
       </SidebarHeader>
+
       <SidebarContent className="py-0">
         {navData && <NavMain items={navData.navMain} />}
       </SidebarContent>
+
       <SidebarFooter>
         <NavUser />
       </SidebarFooter>

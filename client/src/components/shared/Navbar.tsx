@@ -29,7 +29,7 @@ export default function Navbar() {
     if (user.role === "admin") {
       setDashboardLink("/admin/dashboard");
     } else {
-      setDashboardLink("/user/dashboard");
+      setDashboardLink("/user/buyer/dashboard");
     }
   }, [user]);
 
