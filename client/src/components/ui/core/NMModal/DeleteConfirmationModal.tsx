@@ -10,38 +10,40 @@ import {
 import { Button } from "@/components/ui/button";
 
 interface DeleteModalProps {
-  name: string | null;
+  name?: string | null; // `name` অপশনাল করা হলো
+  title: string;
+  description: string;
   isOpen: boolean;
-  onOpenChange: (isOpen: boolean) => void;
+  onClose: () => void; // `onClose` রাখা হলো
   onConfirm: () => void;
 }
+
 
 const DeleteConfirmationModal: React.FC<DeleteModalProps> = ({
   name,
   isOpen,
-  onOpenChange,
+  onClose,
   onConfirm,
 }) => {
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Delete Item</DialogTitle>
           <DialogDescription>
             Are you sure you want to delete{" "}
-            <span className="font-semibold text-red-500">{name}</span>? This
-            action cannot be undone.
+            <span className="font-semibold text-red-500">{name} ?</span>
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onClose()}>
             Cancel
           </Button>
           <Button
             variant="destructive"
             onClick={() => {
               onConfirm();
-              onOpenChange(false);
+              onClose();
             }}
           >
             Confirm
@@ -51,5 +53,6 @@ const DeleteConfirmationModal: React.FC<DeleteModalProps> = ({
     </Dialog>
   );
 };
+
 
 export default DeleteConfirmationModal;

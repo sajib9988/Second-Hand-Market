@@ -14,6 +14,9 @@ import DiscountModal from "./DiscountModal";
 import { IProducts } from "@/type/products";
 import { IMeta } from "@/type/meta";
 import TablePagination from "@/components/ui/core/NMTable/TablePagination";
+import { deleteProduct } from "@/service/product";
+import { toast } from "sonner";
+import DeleteConfirmationModal from "@/components/ui/core/NMModal/DeleteConfirmationModal";
 
 
 const ManageProducts = ({
@@ -25,15 +28,29 @@ const ManageProducts = ({
 }) => {
   const router = useRouter();
   const [selectedIds, setSelectedIds] = useState<string[] | []>([]);
-
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteProductId, setDeleteProductId] = useState<string | null>(null);
   const handleView = (product: IProducts) => {
     console.log("Viewing product:", product);
   };
-
-  const handleDelete = (productId: string) => {
-    console.log("Deleting product with ID:", productId);
+// delete function
+ const handleDelete = async () => {
+    if (!deleteProductId) return;
+    try {
+      const response = await deleteProduct(deleteProductId);
+      if (response.success) {
+        toast.success("Product deleted successfully");
+      } else {
+        toast.error(response.message || "Failed to delete product");
+      }
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      toast.error("Failed to delete product");
+    } finally {
+      setDeleteModalOpen(false);
+      setDeleteProductId(null);
+    }
   };
-
   const columns: ColumnDef<IProducts>[] = [
     {
       id: "select",
@@ -130,7 +147,7 @@ const ManageProducts = ({
             title="Edit"
             onClick={() =>
               router.push(
-                `/user/shop/products/update-product/${row.original._id}`
+                `/user/products/update-product/${row.original._id}`
               )
             }
           >
@@ -140,7 +157,10 @@ const ManageProducts = ({
           <button
             className="text-gray-500 hover:text-red-500"
             title="Delete"
-            onClick={() => handleDelete(row.original._id)}
+            onClick={() => {
+              setDeleteProductId(row.original._id);
+              setDeleteModalOpen(true);
+            }}
           >
             <Trash className="w-5 h-5" />
           </button>
@@ -168,8 +188,27 @@ const ManageProducts = ({
       </div>
       <NMTable columns={columns} data={products || []} />
       <TablePagination totalPage={meta?.totalPage} />
+
+      <DeleteConfirmationModal
+  name={products.find((product) => product._id === deleteProductId)?.name || "this product"}
+  isOpen={deleteModalOpen}
+  onClose={() => setDeleteModalOpen(false)}
+  onConfirm={handleDelete}
+  title="Delete Item"
+  description={`Are you sure you want to delete ${
+    products.find((product) => product._id === deleteProductId)?.name || "this product"
+  }?`}
+/>
+
+
+
+
+
+
+
+
     </div>
   );
 };
 
-export default ManageProducts;
+export default ManageProducts; 
