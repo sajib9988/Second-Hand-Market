@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const { user, setUser } = useUser();
+  console.log("user", user);
   const [menuOpen, setMenuOpen] = useState(false);
   const [dashboardLink, setDashboardLink] = useState("");
   const router = useRouter();

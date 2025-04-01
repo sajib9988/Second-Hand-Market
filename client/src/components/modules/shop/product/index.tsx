@@ -155,7 +155,7 @@ const ManageProducts = ({
         <h1 className="text-xl font-bold">Manage Products</h1>
         <div className="flex items-center gap-2">
           <Button
-            onClick={() => router.push("/user/shop/products/add-product")}
+            onClick={() => router.push("/user/products/add-product")}
             size="sm"
           >
             Add Product <Plus />

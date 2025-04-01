@@ -60,7 +60,7 @@ export default function LoginForm() {
         if (redirect) {
           router.push(redirect);
         } else {
-          router.push("/profile");
+          router.push("/");
         }
       } else {
         console.error("Login failed:", res);

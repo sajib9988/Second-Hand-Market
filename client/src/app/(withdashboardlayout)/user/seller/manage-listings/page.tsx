@@ -1,10 +1,13 @@
+import ManageProducts from "@/components/modules/shop/product"
+import { getAllProducts } from "@/service/product";
 
 
-const ManageListingsPage = () => {
+const ManageListingsPage =async () => {
+    const { data, meta } = await getAllProducts();
   return (
-    <div>
+    <div> 
         <h1>
-            Manage Listings
+            <ManageProducts products={data} meta={meta}></ManageProducts>
         </h1>
     </div>
   )
