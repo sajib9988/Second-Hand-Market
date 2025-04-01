@@ -3,10 +3,16 @@ export interface IOrder {
     coupon?: string;
     shippingAddress: string;
     paymentMethod: string;
-  }
-  
-  export interface IOrderProduct {
-    product: string;
+    totalAmount: number;
+    status: string;
+    createdAt: string;
+}
+
+export interface IOrderProduct {
+    product: {
+        name: string;
+        _id: string;
+    };
     quantity: number;
     color: string;
-  }
+}

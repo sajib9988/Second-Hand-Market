@@ -1,11 +1,10 @@
+import { Chart } from "@/components/modules/order/Chart"
 
 
 const SellerDashboardPage = () => {
   return (
     <div>
-        <h1>
-        Seller Dashboard page
-        </h1>
+    <Chart></Chart>
 </div>
   )
 }

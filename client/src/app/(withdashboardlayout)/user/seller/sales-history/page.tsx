@@ -1,11 +1,12 @@
+import SalesHistory from "@/components/modules/order/SalesHistory"
 
 
 const SelesHistoryPage = () => {
   return (
     <div>
-        <h1>
-        SelesHistoryPage
-        </h1>
+        
+        <SalesHistory></SalesHistory>
+        
     </div>
   )
 }
