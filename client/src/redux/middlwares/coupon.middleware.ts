@@ -2,7 +2,7 @@ import { Store, Dispatch, Action } from "@reduxjs/toolkit";
 import {
   addProduct,
   decrementOrderQuantity,
-  fetchCoupon,
+
   incrementOrderQuantity,
   removeProduct,
   subTotalSelector,
@@ -17,20 +17,8 @@ export const couponMiddleware =
       action.type === decrementOrderQuantity.type ||
       action.type === removeProduct.type
     ) {
-      next(action);
-
       const state: RootState = store.getState();
-
       const subTotal = subTotalSelector(state);
-
-      store.dispatch(
-        fetchCoupon({
-          couponCode: state.cart.coupon.code,
-          subTotal: subTotal,
-          shopId: state.cart.shopId,
-        }) as unknown as Action
-      );
-    } else {
-      next(action);
     }
+    return next(action);
   };
