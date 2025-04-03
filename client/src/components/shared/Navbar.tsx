@@ -16,14 +16,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Logo from "@/assets/svgs/Logo";
 import { logout } from "@/service/AuthService";
 import { useRouter } from "next/navigation";
+import { useAppDispatch } from "@/redux/hook";
+import { addProduct } from "@/redux/feature/CartSlice";
 
 export default function Navbar() {
-  const { user, setUser } = useUser();
+  const { user, setUser } = useUser(); 
   console.log("user", user);
   const [menuOpen, setMenuOpen] = useState(false);
   const [dashboardLink, setDashboardLink] = useState("");
   const router = useRouter();
-  
+  const dispatch = useAppDispatch();
   useEffect(() => {
     if (!user) return;
 
@@ -33,6 +35,10 @@ export default function Navbar() {
       setDashboardLink("/user/buyer/dashboard");
     }
   }, [user]);
+
+  // const handleAddToCart = () => {
+  //   dispatch(addProduct());
+  // }
 
   const handleLogout = async () => {
     await logout();
@@ -82,7 +88,11 @@ export default function Navbar() {
 
             {/* Cart Icon */}
             <Link href="/cart">
-              <Button variant="outline" className="rounded-full p-0 w-10 h-10 flex items-center justify-center">
+              <Button
+                variant="outline"
+                className="rounded-full p-0 w-10 h-10 flex items-center justify-center"
+                // onClick={() => handleAddToCart()}
+              >
                 <ShoppingCart className="w-5 h-5" />
               </Button>
             </Link>

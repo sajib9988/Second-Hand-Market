@@ -3,15 +3,23 @@
 import { IOrder } from "@/type/order";
 import { cookies } from "next/headers";
 
-export const createOrder = async (order: IOrder) => {
+export const createOrder = async (order: any) => {
   try {
+    // Ensure required fields are present
+    const orderPayload = {
+      ...order,
+      totalAmount: order.totalAmount || 0,
+      status: order.status || "Pending",
+      createdAt: order.createdAt || new Date().toISOString()
+    };
+
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/order`, {
       method: "POST",
       headers: {
         Authorization: (await cookies()).get("accessToken")!.value,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(order),
+      body: JSON.stringify(orderPayload),
     });
 
     return await res.json();

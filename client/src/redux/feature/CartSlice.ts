@@ -1,6 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createSelector } from "@reduxjs/toolkit";
 import { RootState } from "../store";
-
 import { IProducts } from "@/type/products";
 
 export interface CartProduct extends IProducts {
@@ -35,34 +34,24 @@ const cartSlice = createSlice({
 
       state.products.push({ ...action.payload, orderQuantity: 1 });
     },
-
-
-
-
-
     incrementOrderQuantity: (state, action) => {
       const productToIncrement = state.products.find(
         (product) => product._id === action.payload
       );
-    
+
       if (productToIncrement) {
         productToIncrement.orderQuantity += 1;
       }
     },
     decrementOrderQuantity: (state, action) => {
-      const productToIncrement = state.products.find(
+      const productToDecrement = state.products.find(
         (product) => product._id === action.payload
       );
-    
-      if (productToIncrement && productToIncrement.orderQuantity > 1) {
-        productToIncrement.orderQuantity -= 1;
+
+      if (productToDecrement && productToDecrement.orderQuantity > 1) {
+        productToDecrement.orderQuantity -= 1;
       }
     },
-
-
-
-
-
     removeProduct: (state, action) => {
       state.products = state.products.filter(
         (product) => product._id !== action.payload
@@ -82,70 +71,50 @@ const cartSlice = createSlice({
   },
 });
 
-//* Products
+//* Selectors
+export const orderedProductsSelector = (state: RootState) => state.cart.products;
 
-export const orderedProductsSelector = (state: RootState) => {
-  return state.cart.products;
-};
-
-export const orderSelector = (state: RootState) => {
-  return {
-    products: state.cart.products.map((product) => ({
-      product: product._id,
-      quantity: product.orderQuantity,
-      color: "White", // Consider making this dynamic if your products have color options
-    })),
-    shippingAddress: `${state.cart.shippingAddress} - ${state.cart.city}`,
-    paymentMethod: "Online",
-  };
-};
-
-//* Payment
-
-export const subTotalSelector = (state: RootState) => {
-  return state.cart.products.reduce((acc, product) => {
-    if (product.offerPrice) {
-      return acc + product.offerPrice * product.orderQuantity;
-    } else {
-      return acc + product.price * product.orderQuantity;
-    }
+export const subTotalSelector = (state: RootState) =>
+  state.cart.products.reduce((acc, product) => {
+    return acc + (product.offerPrice ?? product.price) * product.orderQuantity;
   }, 0);
-};
 
 export const shippingCostSelector = (state: RootState) => {
-  if (
-    state.cart.city &&
-    state.cart.city === "Dhaka" &&
-    state.cart.products.length > 0
-  ) {
+  if (state.cart.city === "Dhaka" && state.cart.products.length > 0) {
     return 60;
-  } else if (
-    state.cart.city &&
-    state.cart.city !== "Dhaka" &&
-    state.cart.products.length > 0
-  ) {
+  } else if (state.cart.city && state.cart.products.length > 0) {
     return 120;
   } else {
     return 0;
   }
 };
 
-export const grandTotalSelector = (state: RootState) => {
-  const subTotal = subTotalSelector(state);
-  const shippingCost = shippingCostSelector(state);
+export const grandTotalSelector = createSelector(
+  [subTotalSelector, shippingCostSelector],
+  (subTotal, shippingCost) => subTotal + shippingCost
+);
 
-  return subTotal + shippingCost;
-};
+//* Memoized Order Selector
+const cartState = (state: RootState) => state.cart;
 
-//* Address
+export const orderSelector = createSelector(
+  [cartState, subTotalSelector, shippingCostSelector],
+  (cart, subTotal, shippingCost) => ({
+    products: cart.products.map((product) => ({
+      product: product._id,
+      quantity: product.orderQuantity,
+      color: "White",
+    })),
+    shippingAddress: `${cart.shippingAddress} - ${cart.city}`,
+    paymentMethod: "Online",
+    totalAmount: subTotal + shippingCost,
+    status: "Pending",
+    createdAt: new Date().toISOString(),
+  })
+);
 
-export const citySelector = (state: RootState) => {
-  return state.cart.city;
-};
-
-export const shippingAddressSelector = (state: RootState) => {
-  return state.cart.shippingAddress;
-};
+export const citySelector = (state: RootState) => state.cart.city;
+export const shippingAddressSelector = (state: RootState) => state.cart.shippingAddress;
 
 export const {
   addProduct,
@@ -156,4 +125,5 @@ export const {
   updateShippingAddress,
   clearCart,
 } = cartSlice.actions;
+
 export default cartSlice.reducer;

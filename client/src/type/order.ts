@@ -1,12 +1,16 @@
+// Add this to your type/order.ts file or where your interfaces are defined
 export interface IOrder {
-    products: IOrderProduct[];
-    coupon?: string;
+    products: {
+      product: string;
+      quantity: number;
+      color: string;
+    }[];
     shippingAddress: string;
     paymentMethod: string;
     totalAmount: number;
     status: string;
     createdAt: string;
-}
+  }
 
 export interface IOrderProduct {
     product: {
