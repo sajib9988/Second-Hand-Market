@@ -12,7 +12,7 @@ import { persistStore } from "redux-persist";
 
 
 export default function StoreProvider({ children }: { children: ReactNode }) {
-  const storeRef = useRef<AppStore>(undefined);
+  const storeRef = useRef<AppStore | null>(null);
 
   if (!storeRef.current) {
     storeRef.current = makeStore();

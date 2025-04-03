@@ -35,26 +35,34 @@ const cartSlice = createSlice({
 
       state.products.push({ ...action.payload, orderQuantity: 1 });
     },
+
+
+
+
+
     incrementOrderQuantity: (state, action) => {
       const productToIncrement = state.products.find(
         (product) => product._id === action.payload
       );
-
+    
       if (productToIncrement) {
         productToIncrement.orderQuantity += 1;
-        return;
       }
     },
     decrementOrderQuantity: (state, action) => {
       const productToIncrement = state.products.find(
         (product) => product._id === action.payload
       );
-
+    
       if (productToIncrement && productToIncrement.orderQuantity > 1) {
         productToIncrement.orderQuantity -= 1;
-        return;
       }
     },
+
+
+
+
+
     removeProduct: (state, action) => {
       state.products = state.products.filter(
         (product) => product._id !== action.payload
