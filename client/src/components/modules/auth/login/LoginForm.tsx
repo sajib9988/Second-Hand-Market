@@ -18,10 +18,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { loginSchema } from "./loginValidation";
 import { useState } from "react";
-import { loginUser, reCaptchaTokenVerification } from "@/service/AuthService";
+import { getCurrentUser, loginUser } from "@/service/AuthService";
 import { redirect } from "next/navigation";
 import { useRouter, useSearchParams } from "next/navigation";
 import Logo from "@/assets/svgs/Logo";
+import { useUser } from "@/context/userContext";
 
 export default function LoginForm() {
   const form = useForm({
@@ -32,6 +33,8 @@ export default function LoginForm() {
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirectPath");
   const router = useRouter();
+
+  const { setUser } = useUser(); // Assuming you have a user context or state management for user
 
 
   const {
@@ -57,6 +60,13 @@ export default function LoginForm() {
       console.log("Login response:", res); // Log the response
       if (res?.success) {
         toast.success(res?.message || "Login successful");
+
+        const currentUser =await getCurrentUser()
+
+        setUser(currentUser);
+
+
+        
         if (redirect) {
           router.push(redirect);
         } else {

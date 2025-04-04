@@ -12,6 +12,7 @@ import { ReviewRoutes } from '../modules/review/review.routes';
 import { FlashSaleRoutes } from '../modules/flashSell/flashSale.routes';
 import { MetaRoutes } from '../modules/meta/meta.route';
 import authRouter from '../modules/auth/auth.routes';
+import { WishlistRoutes } from '../modules/wishlist/wishlsit.route';
 const router = Router();
 
 const moduleRoutes = [
@@ -56,6 +57,10 @@ const moduleRoutes = [
    {
       path: '/meta',
       route: MetaRoutes,
+   },
+   {
+      path: '/wishlist',
+      route: WishlistRoutes,
    },
 ];
 
