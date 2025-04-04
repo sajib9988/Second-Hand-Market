@@ -11,16 +11,38 @@ import {
 import { addProduct } from "@/redux/feature/CartSlice";
 import { useAppDispatch } from "@/redux/hook";
 import { IProducts } from "@/type/products";
-
 import { Heart, ShoppingCart, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { addToWishlist, removeFromWishlist } from "@/service/wishlist";
+import { useState } from "react";
 
-const ProductCard = ({ product }: { product: IProducts }) => {
+const ProductCard = ({ 
+  product,
+  isInWishlist = false 
+}: { 
+  product: IProducts;
+  isInWishlist?: boolean;
+}) => {
+  const [isWishlist, setIsWishlist] = useState(isInWishlist);
   const dispatch = useAppDispatch();
 
   const handleAddProduct = (product: IProducts) => {
     dispatch(addProduct(product));
+  };
+
+  const handleAddToWishlist = async () => {
+    try {
+      if (!isWishlist) {
+        await addToWishlist(product._id);
+        setIsWishlist(true);
+      } else {
+        await removeFromWishlist(product._id);
+        setIsWishlist(false);
+      }
+    } catch (error) {
+      console.error("Error handling wishlist:", error);
+    }
   };
 
   return (
@@ -102,11 +124,12 @@ const ProductCard = ({ product }: { product: IProducts }) => {
             <ShoppingCart />
           </Button>
           <Button
+            onClick={handleAddToWishlist}
             variant="outline"
             size="sm"
             className="w-8 h-8 p-0 flex items-center justify-center rounded-full"
           >
-            <Heart />
+            <Heart className={isWishlist ? "fill-red-500 stroke-red-500" : ""} />
           </Button>
         </div>
       </CardFooter>

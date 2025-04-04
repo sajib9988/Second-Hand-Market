@@ -16,9 +16,10 @@ import Logo from "@/assets/svgs/Logo";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registrationSchema } from "./registerValidation";
 import { toast } from "sonner";
-import { registerUser } from "@/service/AuthService";
+import { getCurrentUser, registerUser } from "@/service/AuthService";
 import { Router } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/context/userContext";
 
 export default function RegisterForm() {
 
@@ -34,7 +35,7 @@ export default function RegisterForm() {
   const password = form.watch("password");
   const passwordConfirm = form.watch("passwordConfirm");
   //   console.log(password, passwordConfirm);
-
+  const { setUser } = useUser()
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
 
     try {
@@ -42,7 +43,14 @@ export default function RegisterForm() {
    
       if (res?.success) {
         toast.success(res?.message);
-        router.push("/"); // Redirect to home page after successful registration
+        router.push("/");
+        
+     const currentUser =await getCurrentUser()
+        
+     setUser(currentUser);
+        
+        
+        // Redirect to home page after successful registration
       } else {
         toast.error(res?.message);
       }

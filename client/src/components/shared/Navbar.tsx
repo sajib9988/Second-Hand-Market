@@ -16,22 +16,20 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Logo from "@/assets/svgs/Logo";
 import { logout } from "@/service/AuthService";
 import { useRouter } from "next/navigation";
-import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import {  orderedProductsSelector } from "@/redux/feature/CartSlice";
+import {  useAppSelector } from "@/redux/hook";
+import { orderedProductsSelector } from "@/redux/feature/CartSlice";
+import { getMyWishlist } from "@/service/wishlist";
 
 export default function Navbar() {
   const { user, setUser } = useUser(); 
-  console.log("user", user);
   const [menuOpen, setMenuOpen] = useState(false);
   const [dashboardLink, setDashboardLink] = useState("");
+  const [wishlistCount, setWishlistCount] = useState(0);
   const router = useRouter();
 
-
-    // Get cart items count from Redux
-    const cartItems = useAppSelector(orderedProductsSelector);
-    const cartItemsCount = cartItems.reduce((total, item) => total + item.orderQuantity, 0);
-
-
+  // Get cart items count from Redux
+  const cartItems = useAppSelector(orderedProductsSelector);
+  const cartItemsCount = cartItems.reduce((total, item) => total + item.orderQuantity, 0);
 
   useEffect(() => {
     if (!user) return;
@@ -41,37 +39,46 @@ export default function Navbar() {
     } else {
       setDashboardLink("/user/buyer/dashboard");
     }
-  }, [user]);
 
-  // const handleAddToCart = () => {
-  //   dispatch(addProduct());
-  // }
+    // Fetch wishlist data when user is logged in
+    const fetchWishlist = async () => {
+      try {
+        const wishlistData = await getMyWishlist();
+        console.log("Wishlist Data:", wishlistData); // Debugging line
+        setWishlistCount(wishlistData?.data?.length);
+         console.log("Wishlist Count:", wishlistData.length); // Debugging line 
+      } catch (error) {
+        console.error("Failed to fetch wishlist:", error);
+      }
+    };
+
+    fetchWishlist();
+  }, [user]);
 
   const handleLogout = async () => {
     await logout();
     setUser(null);
-    router.push('/login'); // Redirect after logout
+    setWishlistCount(0); // Reset wishlist count on logout
+    router.push('/login');
   };
 
   return (
-    <nav className="bg-white shadow-sm">
+    <nav className="bg-white shadow-sm sticky top-0 z-10">
       <div className="container mx-auto">
         <div className="flex justify-between items-center py-4 px-4">
           {/* Left Side: Logo & Links */}
           <div className="flex items-center">
-            <span  className="text-2xl font-black flex items-center">
-              <Logo /> {/* Logo without the text "Your Shop" */}
+            <span className="text-2xl font-black flex items-center">
+              <Logo />
             </span>
 
             <div className="hidden md:flex space-x-6 ml-6">
-              {/* Home Icon with Name */}
               <Link href="/" className="text-center">
-                <Home className="w-7 h-7 mx-auto" /> {/* Increased Home Icon Size */}
+                <Home className="w-7 h-7 mx-auto" />
                 <span className="text-sm">Home</span>
               </Link>
-              {/* Products Icon with Name */}
               <Link href="/products" className="text-center">
-                <ShoppingBag className="w-7 h-7 mx-auto" /> {/* Products Icon */}
+                <ShoppingBag className="w-7 h-7 mx-auto" />
                 <span className="text-sm">Products</span>
               </Link>
             </div>
@@ -88,10 +95,20 @@ export default function Navbar() {
 
           {/* Right Side: Cart, Dashboard & Auth */}
           <div className="flex items-center space-x-3">
-            {/* Wishlist Icon */}
-            <Button variant="outline" className="rounded-full p-0 w-10 h-10 flex items-center justify-center">
-              <Heart className="w-5 h-5" />
-            </Button>
+            {/* Wishlist Icon with Count Badge */}
+            <Link href="/user/buyer/wishlist">
+              <Button
+                variant="outline"
+                className="rounded-full p-0 w-10 h-10 flex items-center justify-center relative"
+              >
+                <Heart className="w-5 h-5" />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {wishlistCount}
+                  </span>
+                )}
+              </Button>
+            </Link>
 
             {/* Cart Icon with Count Badge */}
             <Link href="/cart">
@@ -111,7 +128,6 @@ export default function Navbar() {
             {/* User Menu */}
             {user ? (
               <div className="flex items-center space-x-2">
-                {/* User Dropdown */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="rounded-full p-0 h-10 w-10">
@@ -130,7 +146,7 @@ export default function Navbar() {
                     <DropdownMenuItem>
                       <Link href={dashboardLink} className="w-full">Dashboard</Link>
                     </DropdownMenuItem>
-                     <DropdownMenuSeparator />
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem className="bg-red-500 text-white hover:bg-red-600" onClick={handleLogout}>
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Logout</span>
@@ -158,7 +174,7 @@ export default function Navbar() {
         {menuOpen && (
           <div className="md:hidden bg-gray-100 p-4 flex flex-col space-y-2">
             <Link href="/products" className="text-center hover:text-blue-600">
-              <ShoppingBag className="w-7 h-7 mx-auto" /> {/* Products Icon for mobile */}
+              <ShoppingBag className="w-7 h-7 mx-auto" />
               <span className="text-sm">Products</span>
             </Link>
             <input
