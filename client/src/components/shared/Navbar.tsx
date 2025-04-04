@@ -16,8 +16,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Logo from "@/assets/svgs/Logo";
 import { logout } from "@/service/AuthService";
 import { useRouter } from "next/navigation";
-import { useAppDispatch } from "@/redux/hook";
-import { addProduct } from "@/redux/feature/CartSlice";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import {  orderedProductsSelector } from "@/redux/feature/CartSlice";
 
 export default function Navbar() {
   const { user, setUser } = useUser(); 
@@ -25,7 +25,14 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dashboardLink, setDashboardLink] = useState("");
   const router = useRouter();
-  const dispatch = useAppDispatch();
+
+
+    // Get cart items count from Redux
+    const cartItems = useAppSelector(orderedProductsSelector);
+    const cartItemsCount = cartItems.reduce((total, item) => total + item.orderQuantity, 0);
+
+
+
   useEffect(() => {
     if (!user) return;
 
@@ -86,14 +93,18 @@ export default function Navbar() {
               <Heart className="w-5 h-5" />
             </Button>
 
-            {/* Cart Icon */}
+            {/* Cart Icon with Count Badge */}
             <Link href="/cart">
               <Button
                 variant="outline"
-                className="rounded-full p-0 w-10 h-10 flex items-center justify-center"
-                // onClick={() => handleAddToCart()}
+                className="rounded-full p-0 w-10 h-10 flex items-center justify-center relative"
               >
                 <ShoppingCart className="w-5 h-5" />
+                {cartItemsCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {cartItemsCount}
+                  </span>
+                )}
               </Button>
             </Link>
 
