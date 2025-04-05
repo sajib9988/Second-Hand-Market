@@ -106,14 +106,16 @@ const ProductCard = ({
 
       <CardFooter className="block p-0">
         <div className="flex gap-2 items-center justify-between">
+          <Link href={"/cart"}>
           <Button
             disabled={product?.stock === 0}
             size="sm"
             variant="outline"
-            className="w-32"
+            className="w-32 hover:bg-green-300"
           >
             Buy Now
           </Button>
+          </Link>
           <Button
             onClick={() => handleAddProduct(product)}
             disabled={product?.stock === 0}

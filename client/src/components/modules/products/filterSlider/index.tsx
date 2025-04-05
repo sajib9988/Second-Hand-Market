@@ -1,89 +1,118 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Slider } from "@/components/ui/slider";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { getAllCategories } from "@/service/category";
+import { getAllBrands } from "@/service/brand";
+import { toast } from "sonner";
+import { IBrand } from "@/type/brand";
 
 const FilterSidebar = () => {
   const [price, setPrice] = useState(50);
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState<IBrand[]>([]);
+  const [search, setSearch] = useState("");
+  const [availability, setAvailability] = useState("");
 
-  const productTypes = [
-    "Laptop & Accessories",
-    "Computers Pc",
-    "Speakers & Headset",
-    "Keyboards & Mouse",
-    "Camera",
-    "Video Recording",
-    "Tablet",
-    "Table Lights",
-  ];
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  const brands = ["HP", "Apple", "Dell", "Asus", "Canon"];
-  const ratings = [5, 4, 3, 2, 1];
-  const availability = ["In Stock", "Pre Order", "Upcoming"];
+  const updateQuery = (key: string, value: string | number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value) {
+      params.set(key, value.toString());
+    } else {
+      params.delete(key);
+    }
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [{ data: categoriesData }, { data: brandsData }] = await Promise.all([
+          getAllCategories(),
+          getAllBrands(),
+        ]);
+        setCategories(categoriesData);
+        setBrands(brandsData);
+      } catch (error) {
+        toast.error("Failed to fetch filters");
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <Card className="p-4 rounded-2xl shadow-md w-72">
       <CardContent>
-        <h2 className="text-lg font-semibold mb-4">Filter By Price</h2>
-        <div className="flex gap-2 mb-2">
-          <input
-            type="text"
-            placeholder="Min"
-            className="border rounded px-2 py-1 w-full"
-          />
-          <input
-            type="text"
-            placeholder="Max"
-            className="border rounded px-2 py-1 w-full"
-          />
-        </div>
+        <h2 className="text-lg font-semibold mb-4">Search</h2>
+        <Input
+          placeholder="Search by name"
+          value={search}
+          onChange={(e) => {
+            const val = e.target.value;
+            setSearch(val);
+            updateQuery("search", val);
+          }}
+        />
+
+        <h2 className="text-lg font-semibold mt-6">Filter By Price</h2>
         <Slider
           defaultValue={[price]}
-          max={100}
-          onValueChange={(val) => setPrice(val[0])}
+          max={1000}
+          onValueChange={(val) => {
+            setPrice(val[0]);
+            updateQuery("price", val[0]);
+          }}
         />
         <p className="mt-2">${price}</p>
 
-        <h2 className="text-lg font-semibold mt-6">Product Types</h2>
-        <ul className="space-y-2 mt-2">
-          {productTypes.map((type, index) => (
-            <li key={index} className="flex items-center gap-2">
-              <Checkbox />
-              <span>{type}</span>
-            </li>
-          ))}
-        </ul>
-
         <h2 className="text-lg font-semibold mt-6">Brands</h2>
         <ul className="space-y-2 mt-2">
-          {brands.map((brand, index) => (
-            <li key={index} className="flex items-center gap-2">
-              <Checkbox />
-              <span>{brand}</span>
+          {brands.map((brand) => (
+            <li key={brand._id} className="flex items-center gap-2">
+              <Checkbox
+                onCheckedChange={(checked) => {
+                  updateQuery("brands", checked ? brand._id : "");
+                }}
+              />
+              <span>{brand.name}</span>
             </li>
           ))}
         </ul>
 
-        <h2 className="text-lg font-semibold mt-6">Rating</h2>
+        <h2 className="text-lg font-semibold mt-6">Categories</h2>
         <ul className="space-y-2 mt-2">
-          {ratings.map((rating, index) => (
-            <li key={index} className="flex items-center gap-2">
-              <Checkbox />
-              <span className="text-yellow-500">
-                {"★".repeat(rating)}
-                {"☆".repeat(5 - rating)}
-              </span>
+          {categories.map((cat: any) => (
+            <li key={cat._id} className="flex items-center gap-2">
+              <Checkbox
+                onCheckedChange={(checked) => {
+                  updateQuery("categories", checked ? cat._id : "");
+                }}
+              />
+              <span>{cat.name}</span>
             </li>
           ))}
         </ul>
 
         <h2 className="text-lg font-semibold mt-6">Availability</h2>
         <ul className="space-y-2 mt-2">
-          {availability.map((status, index) => (
-            <li key={index} className="flex items-center gap-2">
-              <Checkbox />
+          {["In Stock", "Pre Order", "Upcoming"].map((status) => (
+            <li key={status} className="flex items-center gap-2">
+              <Checkbox
+                checked={availability === status}
+                onCheckedChange={() => {
+                  const val = availability === status ? "" : status;
+                  setAvailability(val);
+                  updateQuery("availability", val);
+                }}
+              />
               <span>{status}</span>
             </li>
           ))}

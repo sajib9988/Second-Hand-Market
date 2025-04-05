@@ -7,9 +7,12 @@ import { getAllProducts } from "@/service/product";
 import { ICategory } from "@/type/category";
 
 
-const AllProductsPage = async () => {
+const AllProductsPage = async ({ searchParams }: { searchParams: { search?: string } }) => {
+  
+  const search = searchParams.search || "";
   const { data: categories } = await getAllCategories();
   const { data: products } = await getAllProducts();
+
 
   return (
     <NMContainer>

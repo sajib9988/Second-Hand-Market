@@ -48,92 +48,100 @@ const createProduct = async (
 
 const getAllProduct = async (query: Record<string, unknown>) => {
    const {
-      minPrice,
-      maxPrice,
-      categories,
-      brands,
-      inStock,
-      ratings,
-      ...pQuery
+     minPrice,
+     maxPrice,
+     categories,
+     brands,
+     inStock,
+     ...pQuery
    } = query;
-
+ 
    const filter: Record<string, any> = {};
-
+ 
+   // ✅ Filter by category
    if (categories) {
-      const categoryArray = typeof categories === 'string'
-         ? categories.split(',')
-         : Array.isArray(categories)
-         ? categories
-         : [categories];
-      filter.category = { $in: categoryArray };
+     const categoryArray = typeof categories === 'string'
+       ? categories.split(',')
+       : Array.isArray(categories)
+       ? categories
+       : [categories];
+     filter.category = { $in: categoryArray };
    }
-
+ 
+   // ✅ Filter by brand
    if (brands) {
-      const brandArray = typeof brands === 'string'
-         ? brands.split(',')
-         : Array.isArray(brands)
-         ? brands
-         : [brands];
-      filter.brand = { $in: brandArray };
+     const brandArray = typeof brands === 'string'
+       ? brands.split(',')
+       : Array.isArray(brands)
+       ? brands
+       : [brands];
+     filter.brand = { $in: brandArray };
    }
-
+ 
+   // ✅ Stock availability
    if (inStock !== undefined) {
-      filter.stock = inStock === 'true' ? { $gt: 0 } : 0;
+     filter.stock = inStock === 'true' ? { $gt: 0 } : 0;
    }
-
-   if (ratings) {
-      const ratingArray = typeof ratings === 'string'
-         ? ratings.split(',')
-         : Array.isArray(ratings) ? ratings : [ratings];
-      filter.averageRating = { $in: ratingArray.map(Number) };
-   }
-
+ 
+   // ✅ Filter by rating
+   // if (ratings) {
+   //   const ratingArray = typeof ratings === 'string'
+   //     ? ratings.split(',')
+   //     : Array.isArray(ratings)
+   //     ? ratings
+   //     : [ratings];
+   //   filter.averageRating = { $in: ratingArray.map(Number) };
+   // }
+ 
+   // ✅ Build Mongoose Query with utility class
    const productQuery = new QueryBuilder(
-      Product.find(filter)
-         .populate('category', 'name')
-         .populate('brand', 'name'),
-      pQuery
+     Product.find(filter)
+       .populate('category', 'name')
+       .populate('brand', 'name'),
+     pQuery
    )
-      .search(['name', 'description'])
-      .filter()
-      .sort()
-      .paginate()
-      .fields()
-      .priceRange(Number(minPrice) || 0, Number(maxPrice) || Infinity);
-
+     .search(['name', 'description'])
+     .filter()
+     .sort()
+     .paginate()
+     .fields()
+     .priceRange(Number(minPrice) || 0, Number(maxPrice) || Infinity);
+ 
+   // ✅ Run query
    const products = await productQuery.modelQuery.lean();
-
+ 
+   // ✅ Count total for meta
    const meta = await productQuery.countTotal();
-
+ 
+   // ✅ Get Flash Sale data
    const productIds = products.map((product: any) => product._id);
-
    const flashSales = await FlashSale.find({
-      product: { $in: productIds },
-      discountPercentage: { $gt: 0 },
+     product: { $in: productIds },
+     discountPercentage: { $gt: 0 },
    }).select('product discountPercentage');
-
+ 
+   // ✅ Map product ID → discountPercentage
    const flashSaleMap = flashSales.reduce((acc, { product, discountPercentage }) => {
-      //@ts-ignore
-      acc[product.toString()] = discountPercentage;
-      return acc;
-   }, {});
-
+     //@ts-ignore
+     acc[product.toString()] = discountPercentage;
+     return acc;
+   }, {} as Record<string, number>);
+ 
+   // ✅ Merge offerPrice into products
    const updatedProducts = products.map((product: any) => {
-      //@ts-ignore
-      const discountPercentage = flashSaleMap[product._id.toString()];
-      if (discountPercentage) {
-         product.offerPrice = product.price * (1 - discountPercentage / 100);
-      } else {
-         product.offerPrice = null;
-      }
-      return product;
+     const discount = flashSaleMap[product._id.toString()];
+     product.offerPrice = discount
+       ? product.price * (1 - discount / 100)
+       : null;
+     return product;
    });
-
+ 
    return {
-      meta,
-      result: updatedProducts,
+     meta,
+     result: updatedProducts,
    };
-};
+ };
+ 
 
 const getTrendingProducts = async (limit: number) => {
    const now = new Date();

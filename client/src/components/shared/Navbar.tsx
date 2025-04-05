@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useUser } from "@/context/userContext";
-import { ShoppingCart, LogOut, LogIn, Heart, Home, ShoppingBag } from "lucide-react";  
+import { ShoppingCart, LogOut, LogIn, Heart, Home, ShoppingBag, Search } from "lucide-react";  
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -25,11 +25,15 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dashboardLink, setDashboardLink] = useState("");
   const [wishlistCount, setWishlistCount] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
 
   // Get cart items count from Redux
   const cartItems = useAppSelector(orderedProductsSelector);
   const cartItemsCount = cartItems.reduce((total, item) => total + item.orderQuantity, 0);
+
+
+  
 
   useEffect(() => {
     if (!user) return;
@@ -54,6 +58,13 @@ export default function Navbar() {
 
     fetchWishlist();
   }, [user]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -86,11 +97,21 @@ export default function Navbar() {
 
           {/* Search Bar - Center */}
           <div className="hidden md:block flex-grow max-w-md mx-4">
-            <input
-              type="text"
-              placeholder="Search for products"
-              className="w-full border border-gray-300 rounded-full py-2 px-5"
-            />
+          <form onSubmit={handleSearch} className="relative flex-1 max-w-md mx-4">
+        <input
+          type="text"
+          placeholder="Search products..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full px-4 py-2 pl-10 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-300"
+        />
+        <button 
+          type="submit" 
+          className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500"
+        >
+          <Search className="w-5 h-5" />
+        </button>
+      </form>
           </div>
 
           {/* Right Side: Cart, Dashboard & Auth */}
