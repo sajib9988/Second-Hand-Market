@@ -79,8 +79,10 @@ export default function FilterSidebar() {
           step={1}
           onValueChange={(value) => {
             setPrice(value);
-            handleSearchQuery("price", value[0]);
+            handleSearchQuery("minPrice", 0);         // minPrice fix করে দিচ্ছেন
+            handleSearchQuery("maxPrice", value[0]);  // slider value = maxPrice
           }}
+          
           className="w-full"
         />
         <p className="text-sm mt-2">Selected Price: ${price[0]}</p>
@@ -94,7 +96,7 @@ export default function FilterSidebar() {
             {categories?.map((category: { _id: string; name: string }) => (
               <div key={category._id} className="flex items-center space-x-2">
                 <RadioGroupItem
-                  onClick={() => handleSearchQuery("category", category._id)}
+                  onClick={() => handleSearchQuery("categories", category._id)}
                   value={category._id}
                   id={category._id}
                 />
@@ -118,7 +120,7 @@ export default function FilterSidebar() {
             {brands?.map((brand: { _id: string; name: string }) => (
               <div key={brand._id} className="flex items-center space-x-2">
                 <RadioGroupItem
-                  onClick={() => handleSearchQuery("brand", brand._id)}
+                  onClick={() => handleSearchQuery("brands", brand._id)}
                   value={brand._id}
                   id={brand._id}
                 />
