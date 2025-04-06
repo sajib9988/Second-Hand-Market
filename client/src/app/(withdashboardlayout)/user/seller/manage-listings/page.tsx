@@ -6,9 +6,9 @@ const ManageListingsPage =async () => {
     const { data, meta } = await getAllProducts();
   return (
     <div> 
-        <h1>
+  
             <ManageProducts products={data} meta={meta}></ManageProducts>
-        </h1>
+        
     </div>
   )
 }

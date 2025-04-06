@@ -2,7 +2,11 @@
 
 const PurchaseHistoryPage = () => {
   return (
-    <div>PurchaseHistoryPage</div>
+    <div>
+      <h1>
+      PurchaseHistoryPage
+      </h1>
+      </div>
   )
 }
 
