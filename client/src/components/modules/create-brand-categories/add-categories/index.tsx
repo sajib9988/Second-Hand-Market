@@ -33,8 +33,9 @@ const AddCategoryModal = ({ open, onClose, onCategoryAdded }: AddCategoryModalPr
     }
 
     const formData = new FormData();
-    formData.append("data", JSON.stringify({ name: categoryName }));
-    formData.append("logo", imageFiles[0]);
+    formData.append("data", JSON.stringify({ name: categoryName })); // ✅ Wrapped in `data`
+    formData.append("icon", imageFiles[0]);
+    
 
     setLoading(true);
     try {
