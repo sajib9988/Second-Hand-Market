@@ -1,7 +1,6 @@
 "use client";
 
 import { NMTable } from "@/components/ui/core/NMTable/index";
-
 import { ColumnDef } from "@tanstack/react-table";
 import { Edit, Eye, Plus, Trash } from "lucide-react";
 import Image from "next/image";
@@ -10,14 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import DiscountModal from "./DiscountModal";
-
 import { IProducts } from "@/type/products";
 import { IMeta } from "@/type/meta";
 import TablePagination from "@/components/ui/core/NMTable/TablePagination";
 import { deleteProduct } from "@/service/product";
 import { toast } from "sonner";
 import DeleteConfirmationModal from "@/components/ui/core/NMModal/DeleteConfirmationModal";
-
+import AddCategoryModal from "../../create-brand-categories/add-categories";
+import AddBrandModal from "../../create-brand-categories/Add-Brand";
 
 const ManageProducts = ({
   products,
@@ -30,11 +29,15 @@ const ManageProducts = ({
   const [selectedIds, setSelectedIds] = useState<string[] | []>([]);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteProductId, setDeleteProductId] = useState<string | null>(null);
+
+  const [openBrandModal, setOpenBrandModal] = useState(false);
+  const [openCategoryModal, setOpenCategoryModal] = useState(false);
+
   const handleView = (product: IProducts) => {
     console.log("Viewing product:", product);
   };
-// delete function
- const handleDelete = async () => {
+
+  const handleDelete = async () => {
     if (!deleteProductId) return;
     try {
       const response = await deleteProduct(deleteProductId);
@@ -51,6 +54,7 @@ const ManageProducts = ({
       setDeleteProductId(null);
     }
   };
+
   const columns: ColumnDef<IProducts>[] = [
     {
       id: "select",
@@ -83,7 +87,6 @@ const ManageProducts = ({
       enableSorting: false,
       enableHiding: false,
     },
-
     {
       accessorKey: "name",
       header: "Product Name",
@@ -122,7 +125,7 @@ const ManageProducts = ({
     },
     {
       accessorKey: "offerPrice",
-      header: "Ofter Price",
+      header: "Offer Price",
       cell: ({ row }) => (
         <span>
           $ {row.original.offerPrice ? row.original.offerPrice.toFixed(2) : "0"}
@@ -146,9 +149,7 @@ const ManageProducts = ({
             className="text-gray-500 hover:text-green-500"
             title="Edit"
             onClick={() =>
-              router.push(
-                `/user/products/update-product/${row.original._id}`
-              )
+              router.push(`/user/products/update-product/${row.original._id}`)
             }
           >
             <Edit className="w-5 h-5" />
@@ -178,37 +179,69 @@ const ManageProducts = ({
             onClick={() => router.push("/user/products/add-product")}
             size="sm"
           >
-            Add Product <Plus />
+            Add Product <Plus className="ml-1 w-4 h-4" />
           </Button>
+
+
+          <Button
+            onClick={() => setOpenBrandModal(true)}
+            size="sm"
+            variant="outline"
+          >
+            Add Brand <Plus className="ml-1 w-4 h-4" />
+          </Button>
+
+          <AddBrandModal
+            open={openBrandModal}
+            onClose={() => setOpenBrandModal(false)}
+            onBrandAdded={() => router.refresh()}
+          />
+
+          <Button
+            onClick={() => setOpenCategoryModal(true)}
+            size="sm"
+            variant="outline"
+          >
+            Add Category <Plus className="ml-1 w-4 h-4" />
+          </Button>
+          <AddCategoryModal
+            open={openCategoryModal}
+            onClose={() => setOpenCategoryModal(false)}
+            onCategoryAdded={() => router.refresh()}
+          />
+
           <DiscountModal
             selectedIds={selectedIds}
             setSelectedIds={setSelectedIds}
           />
         </div>
       </div>
+
       <NMTable columns={columns} data={products || []} />
       <TablePagination totalPage={meta?.totalPage} />
 
+      {/* Delete Modal */}
       <DeleteConfirmationModal
-  name={products.find((product) => product._id === deleteProductId)?.name || "this product"}
-  isOpen={deleteModalOpen}
-  onClose={() => setDeleteModalOpen(false)}
-  onConfirm={handleDelete}
-  title="Delete Item"
-  description={`Are you sure you want to delete ${
-    products.find((product) => product._id === deleteProductId)?.name || "this product"
-  }?`}
-/>
+        name={
+          products.find((product) => product._id === deleteProductId)?.name ||
+          "this product"
+        }
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+        title="Delete Item"
+        description={`Are you sure you want to delete ${products.find((product) => product._id === deleteProductId)?.name ||
+          "this product"
+          }?`}
+      />
 
 
 
 
-
-
-
+ 
 
     </div>
   );
 };
 
-export default ManageProducts; 
+export default ManageProducts;
