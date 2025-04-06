@@ -75,16 +75,14 @@ export default function FilterSidebar() {
           <span>$500000</span>
         </div>
         <Slider
-          max={500000}
-          step={1}
-          onValueChange={(value) => {
-            setPrice(value);
-            handleSearchQuery("minPrice", 0);         // minPrice fix করে দিচ্ছেন
-            handleSearchQuery("maxPrice", value[0]);  // slider value = maxPrice
-          }}
-          
-          className="w-full"
-        />
+  max={500000}
+  step={1}
+  onValueChange={(value) => {
+    setPrice(value);
+    handleSearchQuery("maxPrice", value[0]); // Only set maxPrice
+  }}
+  className="w-full"
+/>
         <p className="text-sm mt-2">Selected Price: ${price[0]}</p>
       </div>
 

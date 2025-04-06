@@ -10,16 +10,15 @@ export const getAllProducts = async (
 ) => {
   const params = new URLSearchParams();
 
-  if (query?.price) {
-    params.append("minPrice", "0");
-    params.append("maxPrice", query?.price.toString());
+  if (query?.maxPrice) {
+    params.append("maxPrice", query.maxPrice.toString());
   }
 
-  if (query?.category) {
-    params.append("categories", query?.category.toString());
+  if (query?.categories) { // query?.category এর পরিবর্তে query?.categories
+    params.append("categories", query?.categories.toString());
   }
-  if (query?.brand) {
-    params.append("brands", query?.brand.toString());
+  if (query?.brands) { // query?.brand এর পরিবর্তে query?.brands
+    params.append("brands", query?.brands.toString());
   }
   if (query?.rating) {
     params.append("ratings", query?.rating.toString());
@@ -40,6 +39,15 @@ export const getAllProducts = async (
     return Error(error.message);
   }
 };
+
+
+
+
+
+
+
+
+
 // get single product
 export const getSingleProduct = async (productId: string) => {
   try {
