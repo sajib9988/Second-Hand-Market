@@ -6,13 +6,17 @@ import { getAllCategories } from "@/service/category";
 import { getAllProducts } from "@/service/product";
 import { ICategory } from "@/type/category";
 
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
-const AllProductsPage = async ({ searchParams }: { searchParams: { search?: string } }) => {
-  
-  const search = searchParams.search || "";
+const AllProductsPage = async ({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) => {
+  const query = await searchParams;
+
   const { data: categories } = await getAllCategories();
-  const { data: products } = await getAllProducts();
-
+  const { data: products } = await getAllProducts(undefined, undefined, query);
 
   return (
     <NMContainer>

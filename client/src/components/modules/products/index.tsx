@@ -1,12 +1,12 @@
 import ProductCard from "@/components/ui/core/ProductCard";
-import FilterSidebar from "./filterSlider";
 import { IProducts } from "@/type/products";
+import FilterSidebar from "./filterSlider";
 
 
 const AllProducts = ({ products }: { products: IProducts[] }) => {
   return (
     <div className="flex gap-8 my-10">
-      <div>
+      <div className="w-full max-w-sm">
         <FilterSidebar />
       </div>
       <div>
