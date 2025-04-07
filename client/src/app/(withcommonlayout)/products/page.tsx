@@ -14,10 +14,12 @@ const AllProductsPage = async ({
   searchParams: SearchParams;
 }) => {
   const query = await searchParams;
-  const { category, search, sort, page } = query;
+  const { category, searchTerm, sort, page } = query;
   console.log("query", query);
   console.log("category", category);
+  console.log("searchTerm", searchTerm);
 
+  
   const { data: categories } = await getAllCategories();
   const { data: products } = await getAllProducts(undefined, undefined, query);
 

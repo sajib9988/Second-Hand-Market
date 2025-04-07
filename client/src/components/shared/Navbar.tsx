@@ -62,7 +62,7 @@ export default function Navbar() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+      router.push(`/products?searchTerm=${encodeURIComponent(searchQuery)}`); // search এর পরিবর্তে searchTerm
     }
   };
 
@@ -97,22 +97,22 @@ export default function Navbar() {
 
           {/* Search Bar - Center */}
           <div className="hidden md:block flex-grow max-w-md mx-4">
-          <form onSubmit={handleSearch} className="relative flex-1 max-w-md mx-4">
-        <input
-          type="text"
-          placeholder="Search products..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full px-4 py-2 pl-10 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-300"
-        />
-        <button 
-          type="submit" 
-          className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500"
-        >
-          <Search className="w-5 h-5" />
-        </button>
-      </form>
-          </div>
+  <form onSubmit={handleSearch} className="relative flex-1 max-w-md mx-4">
+    <input
+      type="text"
+      placeholder="Search products..."
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+      className="w-full px-4 py-2 pr-10 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-300" // pr-10 যোগ করো (ডান দিকে প্যাডিং)
+    />
+    <button 
+      type="submit" 
+      className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500" // left-0 এর পরিবর্তে right-0
+    >
+      <Search className="w-5 h-5" />
+    </button>
+  </form>
+</div>
 
           {/* Right Side: Cart, Dashboard & Auth */}
           <div className="flex items-center space-x-3">
@@ -193,24 +193,34 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {menuOpen && (
-          <div className="md:hidden bg-gray-100 p-4 flex flex-col space-y-2">
-            <Link href="/products" className="text-center hover:text-blue-600">
-              <ShoppingBag className="w-7 h-7 mx-auto" />
-              <span className="text-sm">Products</span>
-            </Link>
-            <input
-              type="text"
-              placeholder="Search for products"
-              className="w-full border border-gray-300 rounded-full py-2 px-5 my-2"
-            />
-            {user && <Link href={dashboardLink} className="hover:text-blue-600">Dashboard</Link>}
-            {user ? (
-              <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded text-left">Logout</button>
-            ) : (
-              <Link href="/login" className="bg-blue-600 text-white px-4 py-2 rounded block text-center">Login</Link>
-            )}
-          </div>
-        )}
+  <div className="md:hidden bg-gray-100 p-4 flex flex-col space-y-2">
+    <Link href="/products" className="text-center hover:text-blue-600">
+      <ShoppingBag className="w-7 h-7 mx-auto" />
+      <span className="text-sm">Products</span>
+    </Link>
+    <form onSubmit={handleSearch} className="relative">
+      <input
+        type="text"
+        placeholder="Search products..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        className="w-full px-4 py-2 pr-10 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-300" // ডেস্কটপ ভিউয়ের মতো স্টাইল
+      />
+      <button 
+        type="submit" 
+        className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500" // ডান দিকে সার্চ আইকন
+      >
+        <Search className="w-5 h-5" />
+      </button>
+    </form>
+    {user && <Link href={dashboardLink} className="hover:text-blue-600">Dashboard</Link>}
+    {user ? (
+      <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded text-left">Logout</button>
+    ) : (
+      <Link href="/login" className="bg-blue-600 text-white px-4 py-2 rounded block text-center">Login</Link>
+    )}
+  </div>
+)}
       </div>
     </nav>
   );

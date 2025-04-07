@@ -1,29 +1,30 @@
-"use client";
-
 import { AppStore, makeStore } from "@/redux/store";
-import { ReactNode, useRef } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { persistStore } from "redux-persist";
 
-// const Loading = () => {
-//   return <div>Loading...</div>;
-// };
-
-
 export default function StoreProvider({ children }: { children: ReactNode }) {
   const storeRef = useRef<AppStore | null>(null);
+  const [isReady, setIsReady] = useState(false);
 
-  if (!storeRef.current) {
-    storeRef.current = makeStore();
+  useEffect(() => {
+    if (!storeRef.current) {
+      storeRef.current = makeStore();
+    }
+    setIsReady(true);
+  }, []);
+
+  const persistedStore = storeRef.current ? persistStore(storeRef.current) : null;
+
+  if (!isReady || !persistedStore) {
+    return null; // Or a loading indicator
   }
 
-  const persistedStore = persistStore(storeRef.current);
-
   return (
-    <Provider store={storeRef.current}>
+    <Provider store={storeRef.current!}> {/* Assert non-null here */}
       <PersistGate loading={null} persistor={persistedStore}>
-      {children}
+        {children}
       </PersistGate>
     </Provider>
   );

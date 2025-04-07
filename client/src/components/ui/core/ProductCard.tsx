@@ -16,6 +16,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { addToWishlist, removeFromWishlist } from "@/service/wishlist";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+
 
 const ProductCard = ({ 
   product,
@@ -26,10 +28,17 @@ const ProductCard = ({
 }) => {
   const [isWishlist, setIsWishlist] = useState(isInWishlist);
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   const handleAddProduct = (product: IProducts) => {
     dispatch(addProduct(product));
   };
+
+  const handleBuyNow = (product: IProducts) => {
+    dispatch(addProduct(product));  // Add the product to the cart
+    router.push('/cart');  // Navigate to the cart page
+  };
+  
 
   const handleAddToWishlist = async () => {
     try {
@@ -112,6 +121,7 @@ const ProductCard = ({
             size="sm"
             variant="outline"
             className="w-32 hover:bg-green-300"
+            onClick={() => handleBuyNow(product)}
           >
             Buy Now
           </Button>

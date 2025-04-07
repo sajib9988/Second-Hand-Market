@@ -39,7 +39,7 @@ const productSchema = new Schema<IProduct>(
     category: {
       type: Schema.Types.ObjectId,
       ref: 'Category',
-      default: null,
+      required: [true, 'Category is required'],
     },
     imageUrls: {
       type: [String],
@@ -52,7 +52,7 @@ const productSchema = new Schema<IProduct>(
     brand: {
       type: Schema.Types.ObjectId,
       ref: 'Brand',
-      default: null,
+      required: [true, 'Brand of product is required'],
     },
     averageRating: {
       type: Number,

@@ -24,6 +24,10 @@ export const getAllProducts = async (
     params.append("ratings", query?.rating.toString());
   }
 
+  if (query?.searchTerm) { // search এর পরিবর্তে searchTerm
+    params.append("searchTerm", query?.searchTerm.toString());
+  }
+
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_API}/product?limit=${limit}&page=${page}&${params}`,
