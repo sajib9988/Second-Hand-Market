@@ -8,10 +8,10 @@ export interface IProduct extends Document {
   stock: number;
   weight: number | null;
   offerPrice?: number | null;
-  category: Types.ObjectId;
+  category?: Types.ObjectId;
   imageUrls: string[];
   isActive: boolean;
-  brand: Types.ObjectId;
+  brand?: Types.ObjectId;
   averageRating?: number;
   ratingCount?: number;
   availableColors: string[];

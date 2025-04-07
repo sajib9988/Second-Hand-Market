@@ -16,10 +16,9 @@ const createProductValidationSchema = z.object({
     }).min(0, "Product stock cannot be less than 0"),
     weight: z.number().min(0, "Weight cannot be less than 0").nullable().optional(),
     offer: z.number().min(0, "Offer cannot be less than 0").optional().default(0),
-    category: z.string({
-      required_error: "Category ID is required",
-    }).min(1, "Category ID cannot be empty")
-  })
+    category: z.string().min(1, "Category ID cannot be empty").optional(),
+    brand: z.string().min(1, "Brand ID cannot be empty").optional(),
+  }),
 });
 
 const updateProductValidationSchema = z.object({
@@ -31,11 +30,11 @@ const updateProductValidationSchema = z.object({
     weight: z.number().min(0, "Weight cannot be less than 0").nullable().optional(),
     offer: z.number().min(0, "Offer cannot be less than 0").optional(),
     category: z.string().min(1, "Category ID cannot be empty").optional(),
-  })
+    brand: z.string().min(1, "Brand ID cannot be empty").optional(),
+  }),
 });
 
 export const productValidation = {
   createProductValidationSchema,
-  updateProductValidationSchema
-}
-
+  updateProductValidationSchema,
+};

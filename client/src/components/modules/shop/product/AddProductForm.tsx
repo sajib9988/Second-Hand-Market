@@ -131,6 +131,8 @@ export default function AddProductsForm() {
       price: parseFloat(data.price),
       stock: parseInt(data.stock),
       weight: parseFloat(data.stock),
+      category: data.category || null, // <- Important
+      brand: data.brand || null,       // <- Important
     };
 
     const formData = new FormData();
@@ -194,15 +196,15 @@ export default function AddProductsForm() {
               )}
             />
 
-            <FormField
+<FormField
               control={form.control}
               name="category"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Category</FormLabel>
                   <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    onValueChange={(value) => field.onChange(value || null)}
+                    value={field.value || undefined}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -210,18 +212,19 @@ export default function AddProductsForm() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
                       {categories.map((category) => (
-                        <SelectItem key={category?._id} value={category?._id}>
-                          {category?.name}
+                        <SelectItem key={category._id} value={category._id}>
+                          {category.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="brand"
@@ -229,8 +232,8 @@ export default function AddProductsForm() {
                 <FormItem>
                   <FormLabel>Brand</FormLabel>
                   <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    onValueChange={(value) => field.onChange(value === "none" ? null : value)}
+                    value={field.value || undefined}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -238,14 +241,14 @@ export default function AddProductsForm() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
                       {brands.map((brand) => (
-                        <SelectItem key={brand?._id} value={brand?._id}>
-                          {brand?.name}
+                        <SelectItem key={brand._id} value={brand._id}>
+                          {brand.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-
                   <FormMessage />
                 </FormItem>
               )}
